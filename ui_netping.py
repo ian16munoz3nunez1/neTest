@@ -21,7 +21,11 @@ class Ui_NetPing(object):
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setObjectName('label')
 
+        self.progressBar = QProgressBar(self.centralwidget)
+        self.progressBar.setObjectName('progressBar')
+
         self.gridlayout.addWidget(self.label, 0, 0, 1, 1)
+        self.gridlayout.addWidget(self.progressBar, 1, 0, 1, 1)
         
         MainWindow.setCentralWidget(self.centralwidget)
 
