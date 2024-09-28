@@ -22,6 +22,7 @@ class NetPing(QMainWindow):
         self.__i = 0
         self.__numPacks = 10
         self.__end = False
+        self.__cancel = False
 
         hilo1 = threading.Thread(target=self.ping)
         hilo2 = threading.Thread(target=self.downloadDummy)
@@ -33,6 +34,8 @@ class NetPing(QMainWindow):
         self.progressTimer.start(1100)
 
     def closeEvent(self, event):
+        self.__cancel = True
+        os.remove('dummy.bin')
         os.remove('running.lock')
 
     def updateBar(self):
@@ -57,9 +60,9 @@ class NetPing(QMainWindow):
             with open("dummy.bin", 'wb') as file:
                 i = 0
                 for chunk in req.iter_content(chunk_size=4096):
-                    if self.__end:
+                    if self.__end or self.__cancel:
                         break
-                    print(f"Downloading packet number {i}")
+                    print(f"Downloading chunk number {i}")
                     file.write(chunk)
                     i += 1
             file.close()
@@ -81,17 +84,23 @@ class NetPing(QMainWindow):
                 sent = int(sent_packets.group(1))
                 received = int(received_packets.group(1))
                 loss = int(loss_percentage.group(1))
-                min_latency = int(min_time.group(1))
-                max_latency = int(max_time.group(1))
-                avg_latency = int(avg_time.group(1))
+                min_latency = float(min_time.group(1))
+                max_latency = float(max_time.group(1))
+                avg_latency = float(avg_time.group(1))
 
             if self.__os == 'linux':
                 sent_packets = re.search(r'(\d+) packets transmitted', output)
                 received_packets = re.search(r'(\d+) received', output)
                 loss_percentage = re.search(r'(\d+)% packet loss', output)
+                min_time = re.search(r'rtt min/avg/max/mdev = (\d{2,3}\.\d{2,3})/\d{2,3}\.\d{2,3}/\d{2,3}\.\d{2,3}', output)
+                avg_time = re.search(r'rtt min/avg/max/mdev = \d{2,3}\.\d{2,3}/(\d{2,3}\.\d{2,3})/\d{2,3}\.\d{2,3}', output)
+                max_time = re.search(r'rtt min/avg/max/mdev = \d{2,3}\.\d{2,3}/\d{2,3}\.\d{2,3}/(\d{2,3}\.\d{2,3})', output)
                 sent = int(sent_packets.group(1))
                 received = int(received_packets.group(1))
                 loss = int(loss_percentage.group(1))
+                min_latency = float(min_time.group(1))
+                avg_latency = float(avg_time.group(1))
+                max_latency = float(avg_time.group(1))
 
         except Exception as e:
             QMessageBox.critical(
