@@ -3,6 +3,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QLabel, QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView
 from ui_netping import Ui_NetPing
 import threading
+import requests
 import platform
 import re
 import os
@@ -20,9 +21,13 @@ class NetPing(QMainWindow):
         self.__output = ''
         self.__i = 0
         self.__numPacks = 10
+        self.__end = False
 
-        hilo = threading.Thread(target=self.ping)
-        hilo.start()
+        hilo1 = threading.Thread(target=self.ping)
+        hilo2 = threading.Thread(target=self.downloadDummy)
+        hilo1.start()
+        hilo2.start()
+
         self.progressTimer = QTimer()
         self.progressTimer.timeout.connect(self.updateBar)
         self.progressTimer.start(1100)
@@ -43,6 +48,22 @@ class NetPing(QMainWindow):
             self.__output = Popen("ping -w 1000 -n 10 8.8.8.8", shell=PIPE, stdin=PIPE, stdout=PIPE, stderr=PIPE).stdout.read()
         if self.__os == 'linux':
             self.__output = Popen("ping -W 1 -c 10 8.8.8.8", shell=PIPE, stdin=PIPE, stdout=PIPE, stderr=PIPE).stdout.read()
+
+        self.__end = True
+
+    def downloadDummy(self):
+        with requests.get("https://testfile.org/files-5GB-zip", stream=True) as req:
+            req.raise_for_status()
+            with open("dummy.bin", 'wb') as file:
+                i = 0
+                for chunk in req.iter_content(chunk_size=4096):
+                    if self.__end:
+                        break
+                    print(f"Downloading packet number {i}")
+                    file.write(chunk)
+                    i += 1
+            file.close()
+        print("Download finished")
 
     def showInfo(self):
         try:
