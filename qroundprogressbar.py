@@ -32,7 +32,7 @@ class QRoundProgressBar(QWidget):
         self.lSent = QLabel(self.mainFrame)
         self.lSent.setAlignment(Qt.AlignCenter)
         self.lSent.setCursor(Qt.IBeamCursor)
-        self.lSent.setFixedSize(100, 30)
+        self.lSent.setFixedSize(120, 30)
         self.lSent.setTextInteractionFlags(Qt.LinksAccessibleByMouse|Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.lSent.setStyleSheet(
         """
@@ -45,7 +45,7 @@ class QRoundProgressBar(QWidget):
         self.lReceived.setAlignment(Qt.AlignCenter)
         self.lReceived.setCursor(Qt.IBeamCursor)
         self.lReceived.setTextInteractionFlags(Qt.LinksAccessibleByMouse | Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
-        self.lReceived.setFixedSize(100, 30)
+        self.lReceived.setFixedSize(120, 30)
         self.lReceived.setStyleSheet(
         """
         background-color: rgb(0, 255, 0);
@@ -61,7 +61,7 @@ class QRoundProgressBar(QWidget):
         self.lLoss.setAlignment(Qt.AlignCenter)
         self.lLoss.setCursor(Qt.IBeamCursor)
         self.lLoss.setTextInteractionFlags(Qt.LinksAccessibleByMouse | Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
-        self.lLoss.setFixedSize(100, 30)
+        self.lLoss.setFixedSize(120, 30)
         self.lLoss.setStyleSheet(
         """
         background-color: rgb(255, 0, 0);
