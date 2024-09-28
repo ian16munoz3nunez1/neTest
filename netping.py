@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtWidgets import QMainWindow, QLabel
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QLabel
 from ui_netping import Ui_NetPing
 import threading
 import platform
@@ -7,6 +7,7 @@ import re
 import os
 from time import sleep
 from subprocess import Popen, PIPE
+from qroundprogressbar import QRoundProgressBar
 
 class NetPing(QMainWindow):
     def __init__(self):
@@ -23,7 +24,7 @@ class NetPing(QMainWindow):
         hilo.start()
         self.progressTimer = QTimer()
         self.progressTimer.timeout.connect(self.updateBar)
-        self.progressTimer.start(1000)
+        self.progressTimer.start(1100)
 
     def closeEvent(self, event):
         os.remove('running.lock')
@@ -38,9 +39,9 @@ class NetPing(QMainWindow):
 
     def ping(self):
         if self.__os == 'windows':
-            self.__output = Popen("ping -n 10 8.8.8.8", shell=PIPE, stdin=PIPE, stdout=PIPE, stderr=PIPE).stdout.read()
+            self.__output = Popen("ping -w 1000 -n 10 8.8.8.8", shell=PIPE, stdin=PIPE, stdout=PIPE, stderr=PIPE).stdout.read()
         if self.__os == 'linux':
-            self.__output = Popen("ping -c 10 8.8.8.8", shell=PIPE, stdin=PIPE, stdout=PIPE, stderr=PIPE).stdout.read()
+            self.__output = Popen("ping -W 1 -c 10 8.8.8.8", shell=PIPE, stdin=PIPE, stdout=PIPE, stderr=PIPE).stdout.read()
 
     def showInfo(self):
         self.ui.label.hide()
@@ -63,22 +64,16 @@ class NetPing(QMainWindow):
             received = int(received_packets.group(1))
             loss = int(loss_percentage.group(1))
 
-        self.ui.sentLabel = QLabel(self.ui.centralwidget)
-        self.ui.sentLabel.setText(f"Sent packets: {sent}")
-        self.ui.sentLabel.setAlignment(Qt.AlignCenter)
-        self.ui.sentLabel.setObjectName('sentLabel')
+        self.ui.widget = QWidget(self.ui.centralwidget)
+        self.ui.widget.setFixedSize(200, 200)
+        self.ui.widget.setObjectName('widget')
+        self.ui.widgetGrid = QGridLayout(self.ui.widget)
+        self.ui.widgetGrid.setObjectName('widgetGrid')
+        self.ui.widget.setLayout(self.ui.widgetGrid)
 
-        self.ui.receivedLabel = QLabel(self.ui.centralwidget)
-        self.ui.receivedLabel.setText(f"Received packets: {received}")
-        self.ui.receivedLabel.setAlignment(Qt.AlignCenter)
-        self.ui.receivedLabel.setObjectName('receivedLabel')
+        self.ui.roundProgressBar = QRoundProgressBar(self.ui.widget)
+        self.ui.roundProgressBar.setValue(sent, received, loss)
+        self.ui.widgetGrid.addWidget(self.ui.roundProgressBar)
 
-        self.ui.lossLabel = QLabel(self.ui.centralwidget)
-        self.ui.lossLabel.setText(f"Loss percentage: {loss}%")
-        self.ui.lossLabel.setAlignment(Qt.AlignCenter)
-        self.ui.lossLabel.setObjectName('lossLabel')
-
-        self.ui.gridlayout.addWidget(self.ui.sentLabel, 0, 0, 1, 1)
-        self.ui.gridlayout.addWidget(self.ui.receivedLabel, 1, 0, 1, 1)
-        self.ui.gridlayout.addWidget(self.ui.lossLabel, 2, 0, 1, 1)
+        self.ui.gridlayout.addWidget(self.ui.widget, 0, 0, 1, 1)
 

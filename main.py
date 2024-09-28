@@ -5,6 +5,16 @@ from start import Start
 from netping import NetPing
 
 app = QApplication(sys.argv)
+app.setStyleSheet(
+"""
+QWidget {
+    background-color: rgb(100, 100, 100);
+}
+QLabel {
+    font: 12pt 'monospace';
+}
+"""
+)
 
 running = 'running.lock'
 if os.path.isfile(running):

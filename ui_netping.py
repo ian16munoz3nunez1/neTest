@@ -19,6 +19,8 @@ class Ui_NetPing(object):
         self.label = QLabel(self.centralwidget)
         self.label.setText(u"Pinging 8.8.8.8...")
         self.label.setAlignment(Qt.AlignCenter)
+        self.label.setCursor(Qt.IBeamCursor)
+        self.label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.label.setObjectName('label')
 
         self.progressBar = QProgressBar(self.centralwidget)
