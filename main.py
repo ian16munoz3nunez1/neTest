@@ -12,6 +12,25 @@ QWidget {
 }
 QLabel {
     font: 12pt 'monospace';
+    color: white;
+}
+QPushButton {
+    font: 12pt 'monospace';
+    color: white;
+    background-color: rgb(40, 40, 40);
+    max-height: 30px;
+    border: 1px;
+    border-style: solid;
+    border-color: rgb(0, 100, 0);
+    border-radius: 15px;
+}
+
+QPushButton:hover {
+    background-color: rgb(0, 200, 0);
+}
+
+QPushButton:pressed {
+    background-color: rgb(0, 180, 0);
 }
 """
 )
