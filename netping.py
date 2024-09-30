@@ -108,6 +108,8 @@ class NetPing(QMainWindow):
                 "Connection error",
                 "Unable to connect to internet"
             )
+            os.remove('dummy.bin')
+            os.remove('running.lock')
 
         self.ui.widget = QWidget(self.ui.centralwidget)
         self.ui.widget.setFixedSize(200, 200)

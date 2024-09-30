@@ -27,7 +27,7 @@ class Start(QMainWindow):
         self.close()
 
         if self.__os == 'windows':
-            os.system('py main.py')
+            os.system('main.exe')
         if self.__os == 'linux':
-            os.system('python3 main.py')
+            os.system('./main')
 
