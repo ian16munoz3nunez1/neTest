@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout, QLabel, QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView
 from ui_netping import Ui_NetPing
@@ -35,8 +35,10 @@ class NetPing(QMainWindow):
 
     def closeEvent(self, event):
         self.__cancel = True
-        os.remove('dummy.bin')
-        os.remove('running.lock')
+        if os.path.exists('dummy.bin'):
+            os.remove('dummy.bin')
+        if os.path.exists('running.lock'):
+            os.remove('running.lock')
 
     def updateBar(self):
         if self.__i < self.__numPacks:
@@ -108,8 +110,15 @@ class NetPing(QMainWindow):
                 "Connection error",
                 "Unable to connect to internet"
             )
-            os.remove('dummy.bin')
-            os.remove('running.lock')
+
+            if os.path.exists('dummy.bin'):
+                os.remove('dummy.bin')
+            if os.path.exists('running.lock'):
+                os.remove('running.lock')
+
+            exit(0)
+
+        self.resize(500, 400)
 
         self.ui.widget = QWidget(self.ui.centralwidget)
         self.ui.widget.setFixedSize(200, 200)
@@ -122,10 +131,17 @@ class NetPing(QMainWindow):
         self.ui.roundProgressBar.setValue(sent, received, loss)
         self.ui.widgetGrid.addWidget(self.ui.roundProgressBar)
 
+        self.ui.lFinished = QLabel(self.ui.centralwidget)
+        self.ui.lFinished.setText(u"Test completed")
+        self.ui.lFinished.setAlignment(Qt.AlignCenter)
+        self.ui.lFinished.setCursor(Qt.IBeamCursor)
+        self.ui.lFinished.setTextInteractionFlags(Qt.LinksAccessibleByMouse | Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
+        self.ui.lFinished.setObjectName('lFinished')
+
         self.ui.latencyTable = QTableWidget(self.ui.centralwidget)
         self.ui.latencyTable.setRowCount(3)
         self.ui.latencyTable.setColumnCount(2)
-        self.ui.latencyTable.setHorizontalHeaderLabels(['Latencia', 'Estado'])
+        self.ui.latencyTable.setHorizontalHeaderLabels(['Latency', 'State'])
         self.ui.latencyTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         self.addLatencyResult(0, "Mínima", min_latency)
@@ -133,11 +149,15 @@ class NetPing(QMainWindow):
         self.addLatencyResult(2, "Promedio", avg_latency)
 
         self.ui.gridlayout.addWidget(self.ui.widget, 0, 0, 1, 1)
-        self.ui.gridlayout.addWidget(self.ui.latencyTable, 1, 0, 1, 1)
+        self.ui.gridlayout.addWidget(self.ui.lFinished, 0, 1, 1, 1)
+        self.ui.gridlayout.addWidget(self.ui.latencyTable, 1, 0, 1, 2)
 
     def addLatencyResult(self, row, label, latency):
         """ Agrega los resultados de la latencia a la tabla """
-        self.ui.latencyTable.setItem(row, 0, QTableWidgetItem(f"{label}: {latency} ms"))
+        item = QTableWidgetItem(f"{label}: {latency} ms")
+        item.setBackground(QColor(255, 255, 255))
+        item.setForeground(QColor(0, 0, 0))
+        self.ui.latencyTable.setItem(row, 0, item)
 
         # Evaluación del estado de la latencia con colores
         if latency < 20:
@@ -156,5 +176,6 @@ class NetPing(QMainWindow):
         # Crear celda con el estado y colorearla
         item = QTableWidgetItem(status)
         item.setBackground(color)
+        item.setForeground(QColor(0, 0, 0))
         self.ui.latencyTable.setItem(row, 1, item)
 
